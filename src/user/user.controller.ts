@@ -13,7 +13,12 @@ import {
 } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { User, loginUser } from "../interface/user.interface";
-import { LoginUserDto, UpdateUserDto, userSignUpDto } from "src/dto/userDto";
+import {
+  LoginUserDto,
+  UpdatePasswordDto,
+  UpdateUserDto,
+  userSignUpDto,
+} from "src/dto/userDto";
 import { constants } from "../helper/constants";
 import { LoggerService } from "../logger/logger.service";
 import { AuthGuard } from "../guards/auth.guard";
@@ -93,5 +98,32 @@ export class UserController {
     );
 
     return await this.userService.updateUser(userId, updateUserDto);
+  }
+
+  @HttpCode(200)
+  @Post("/forget-password")
+  @ResponseMessage("Passsword updated successfully")
+  async updatePassword(
+    @Body() updatePasswordDto: UpdatePasswordDto,
+    @Headers("secret") headers
+  ): Promise<User> {
+    this.logger.log(
+      `updatePassword started with userId - ${updatePasswordDto.email}`,
+      `${this.AppName}`
+    );
+    if (headers !== constants?.secret) {
+      this.logger.error(
+        `updatePassword authentication failed with secret passed - ${headers}`,
+        `${this.AppName}`
+      );
+      throw new HttpException(
+        {
+          status: HttpStatus.UNAUTHORIZED,
+          message: "Authorization Failed",
+        },
+        HttpStatus.UNAUTHORIZED
+      );
+    }
+    return await this.userService.updatePassword(updatePasswordDto);
   }
 }

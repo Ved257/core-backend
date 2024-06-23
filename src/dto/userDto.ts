@@ -71,3 +71,14 @@ export class UpdateUserDto {
   @IsNotEmpty()
   currently_employed: boolean;
 }
+
+export class UpdatePasswordDto {
+  @IsNotEmpty()
+  @IsString()
+  password: string;
+
+  @IsEmail()
+  @IsNotEmpty()
+  @IsString()
+  email: string;
+}

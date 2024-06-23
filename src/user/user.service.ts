@@ -1,7 +1,12 @@
 import * as mongoose from "mongoose";
 import { Injectable, Inject, HttpException, HttpStatus } from "@nestjs/common";
 import { User, loginUser } from "../interface/user.interface";
-import { LoginUserDto, UpdateUserDto, userSignUpDto } from "../dto/userDto";
+import {
+  LoginUserDto,
+  UpdatePasswordDto,
+  UpdateUserDto,
+  userSignUpDto,
+} from "../dto/userDto";
 import { constants } from "../helper/constants";
 import { LoggerService } from "../logger/logger.service";
 import { JwtService } from "@nestjs/jwt";
@@ -181,6 +186,56 @@ export class UserService {
     } catch (err) {
       this.logger.error(
         `updateUser failed with userId - ${userId} with error ${err}`,
+        `${this.AppName}`
+      );
+      throw new HttpException(
+        {
+          status: err?.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+          message: err?.message ?? "Something went wrong",
+        },
+        err?.status ?? HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async updatePassword(updatePassword: UpdatePasswordDto): Promise<User> {
+    this.logger.log(
+      `updatePassword started with userId - ${updatePassword.email}`,
+      `${this.AppName}`
+    );
+    try {
+      const hashedPassword: string = await this.passwordService.hashPassword(
+        updatePassword.password
+      );
+      const user: User = await this.userModel
+        .findOneAndUpdate(
+          { email: updatePassword.email },
+          { password: hashedPassword },
+          { new: true, upsert: false }
+        )
+        .lean()
+        .exec();
+      if (!user) {
+        this.logger.warn(
+          `updatePassword started with userId - ${updatePassword.email}`,
+          `${this.AppName}`
+        );
+        throw new HttpException(
+          {
+            status: HttpStatus.BAD_REQUEST,
+            message: "Please provide a valid email",
+          },
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      this.logger.log(
+        `updatePassword ended with UserId - ${updatePassword.email}`,
+        `${this.AppName}`
+      );
+      return user;
+    } catch (err) {
+      this.logger.error(
+        `updatePassword failed with userId - ${updatePassword.email} with error ${err}`,
         `${this.AppName}`
       );
       throw new HttpException(
