@@ -23,6 +23,10 @@ export const userSchema = new mongoose.Schema<User>(
     student_or_new_graduate: Boolean,
     currently_employed: Boolean,
     linkedin_profile: String,
+    term_and_conditions: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );

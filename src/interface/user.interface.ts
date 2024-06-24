@@ -14,6 +14,7 @@ export interface User extends Document {
   readonly student_or_new_graduate: boolean;
   readonly currently_employed: boolean;
   readonly linkedin_profile: string;
+  readonly term_and_conditions: boolean;
 }
 
 export interface loginUser extends User {
