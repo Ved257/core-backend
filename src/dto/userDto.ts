@@ -12,7 +12,7 @@ import {
 } from "class-validator";
 import { currentRole } from "src/enums/user.enum";
 
-export class userSignUpDto {
+export class SignUpDto {
   @IsEmail()
   @IsNotEmpty()
   @IsString()

@@ -5,7 +5,7 @@ import {
   LoginUserDto,
   UpdatePasswordDto,
   UpdateUserDto,
-  userSignUpDto,
+  SignUpDto,
 } from "../dto/userDto";
 import { constants } from "../helper/constants";
 import { LoggerService } from "../logger/logger.service";
@@ -24,7 +24,7 @@ export class UserService {
     private passwordService: PasswordService
   ) {}
 
-  async userSignUp(signUpUser: userSignUpDto): Promise<User> {
+  async userSignUp(signUpUser: SignUpDto): Promise<User> {
     this.logger.log(
       `userSignUp started with email - ${signUpUser?.email}`,
       `${this.AppName}`

@@ -17,7 +17,7 @@ import {
   LoginUserDto,
   UpdatePasswordDto,
   UpdateUserDto,
-  userSignUpDto,
+  SignUpDto,
 } from "src/dto/userDto";
 import { constants } from "../helper/constants";
 import { LoggerService } from "../logger/logger.service";
@@ -36,7 +36,7 @@ export class UserController {
   @Post("/signup")
   @ResponseMessage("User Created Successfully")
   async signupUser(
-    @Body() signUpUser: userSignUpDto,
+    @Body() signUpUser: SignUpDto,
     @Headers("secret") headers
   ): Promise<User> {
     this.logger.log(
