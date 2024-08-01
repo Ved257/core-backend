@@ -24,3 +24,16 @@ export enum currentRole {
   marketing = "Marketing",
   manager = "Manager",
 }
+
+export enum whereInJobSearch {
+  ready_to_interview = "Ready to interview",
+  open_to_offers = "Open to offers",
+  closed_to_offers = "Closed to offers",
+}
+
+export enum jobType {
+  full_time = "Full-time Employee",
+  contractor = "Contractor",
+  intern = "Intern",
+  co_founder = "Co-founder",
+}

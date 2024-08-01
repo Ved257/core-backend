@@ -23,6 +23,8 @@ import { constants } from "../helper/constants";
 import { LoggerService } from "../logger/logger.service";
 import { AuthGuard } from "../guards/auth.guard";
 import { ResponseMessage } from "../decorators/responseMessageDecator";
+import { Preference } from "src/interface/preference.interface";
+import { PreferenceDto } from "src/dto/preferenceDto";
 
 @Controller("user")
 export class UserController {
@@ -108,7 +110,7 @@ export class UserController {
     @Headers("secret") headers
   ): Promise<User> {
     this.logger.log(
-      `updatePassword started with userId - ${updatePasswordDto.email}`,
+      `updatePassword started with email - ${updatePasswordDto.email}`,
       `${this.AppName}`
     );
     if (headers !== constants?.secret) {
@@ -125,5 +127,24 @@ export class UserController {
       );
     }
     return await this.userService.updatePassword(updatePasswordDto);
+  }
+
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  @Put("/prefernces")
+  @ResponseMessage("Preferences updated successfully")
+  async addOrUpdatePreference(
+    @Body() preferenceDto: PreferenceDto,
+    @Req() req
+  ): Promise<Preference> {
+    const userId = req?.user?.userId;
+    this.logger.log(
+      `addOrUpdatePreference started with userid - ${userId}`,
+      `${this.AppName}`
+    );
+    return await this.userService.addOrUpdatePreferenceByUser(
+      userId,
+      preferenceDto
+    );
   }
 }

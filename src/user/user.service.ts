@@ -12,6 +12,8 @@ import { LoggerService } from "../logger/logger.service";
 import { JwtService } from "@nestjs/jwt";
 import { PasswordService } from "../services/password.service";
 import { UserModel } from "src/schemas/user.schema";
+import { Preference } from "src/interface/preference.interface";
+import { PreferenceDto } from "src/dto/preferenceDto";
 
 @Injectable()
 export class UserService {
@@ -19,6 +21,8 @@ export class UserService {
   constructor(
     @Inject(constants.USER_MODEL)
     private userModel: mongoose.Model<User>,
+    @Inject(constants.PREFERENCE_MODEL)
+    private preferenceModel: mongoose.Model<Preference>,
     private logger: LoggerService,
     private jwtService: JwtService,
     private passwordService: PasswordService
@@ -200,7 +204,7 @@ export class UserService {
 
   async updatePassword(updatePassword: UpdatePasswordDto): Promise<User> {
     this.logger.log(
-      `updatePassword started with userId - ${updatePassword.email}`,
+      `updatePassword started with email - ${updatePassword.email}`,
       `${this.AppName}`
     );
     try {
@@ -217,7 +221,7 @@ export class UserService {
         .exec();
       if (!user) {
         this.logger.warn(
-          `updatePassword started with userId - ${updatePassword.email}`,
+          `updatePassword started with email - ${updatePassword.email}`,
           `${this.AppName}`
         );
         throw new HttpException(
@@ -236,6 +240,42 @@ export class UserService {
     } catch (err) {
       this.logger.error(
         `updatePassword failed with userId - ${updatePassword.email} with error ${err}`,
+        `${this.AppName}`
+      );
+      throw new HttpException(
+        {
+          status: err?.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+          message: err?.message ?? "Something went wrong",
+        },
+        err?.status ?? HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async addOrUpdatePreferenceByUser(
+    userId: string,
+    preferenceDto: PreferenceDto
+  ): Promise<Preference> {
+    this.logger.log(
+      `addOrUpdatePreferenceByUser started for userid - ${userId}`,
+      `${this.AppName}`
+    );
+    try {
+      const pref = await this.preferenceModel
+        .findOneAndUpdate({ user_id: userId }, preferenceDto, {
+          upsert: true,
+          new: true,
+        })
+        .lean()
+        .exec();
+      this.logger.log(
+        `addOrUpdatePreferenceByUser ended for userid - ${userId}`,
+        `${this.AppName}`
+      );
+      return pref;
+    } catch (err) {
+      this.logger.error(
+        `addOrUpdatePreferenceByUser failed with userId - ${userId} with error ${err}`,
         `${this.AppName}`
       );
       throw new HttpException(
