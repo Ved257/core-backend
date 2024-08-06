@@ -6,6 +6,7 @@ import {
   UpdatePasswordDto,
   UpdateUserDto,
   SignUpDto,
+  UpdatePasswordThroughSettingsDto,
 } from "../dto/userDto";
 import { constants } from "../helper/constants";
 import { LoggerService } from "../logger/logger.service";
@@ -276,6 +277,60 @@ export class UserService {
     } catch (err) {
       this.logger.error(
         `addOrUpdatePreferenceByUser failed with userId - ${userId} with error ${err}`,
+        `${this.AppName}`
+      );
+      throw new HttpException(
+        {
+          status: err?.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+          message: err?.message ?? "Something went wrong",
+        },
+        err?.status ?? HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async updatePasswordThroughSettings(
+    updateDto: UpdatePasswordThroughSettingsDto,
+    userId: string
+  ): Promise<User> {
+    this.logger.log(
+      `updatePasswordThroughSettings started for userid - ${userId}`,
+      `${this.AppName}`
+    );
+    try {
+      const user: User = await this.userModel.findById(userId).lean().exec();
+      const passwordMatched = await this.passwordService.comparePassword(
+        updateDto.current_password,
+        user.password
+      );
+      let updatedUser: User;
+      if (passwordMatched) {
+        const updatePasswordDto: UpdatePasswordDto = {
+          password: updateDto.new_password,
+          email: user.email,
+        };
+        updatedUser = await this.updatePassword(updatePasswordDto);
+      } else {
+        this.logger.error(
+          `updatePasswordThroughSettings failed for userid - ${userId} as current password is wrong`,
+          `${this.AppName}`
+        );
+        throw new HttpException(
+          {
+            status: HttpStatus.BAD_REQUEST,
+            message: "Please provide correct current password",
+          },
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      this.logger.log(
+        `updatePasswordThroughSettings ended for userid - ${userId}`,
+        `${this.AppName}`
+      );
+      return updatedUser;
+    } catch (err) {
+      this.logger.error(
+        `updatePasswordThroughSettings failed with userId - ${userId} with error ${err}`,
         `${this.AppName}`
       );
       throw new HttpException(

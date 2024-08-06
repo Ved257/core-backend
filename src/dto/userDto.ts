@@ -82,3 +82,17 @@ export class UpdatePasswordDto {
   @IsString()
   email: string;
 }
+
+export class UpdatePasswordThroughSettingsDto {
+  @IsString()
+  @IsNotEmpty()
+  current_password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  new_password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  confirm_new_password: string;
+}

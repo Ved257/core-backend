@@ -18,6 +18,7 @@ import {
   UpdatePasswordDto,
   UpdateUserDto,
   SignUpDto,
+  UpdatePasswordThroughSettingsDto,
 } from "src/dto/userDto";
 import { constants } from "../helper/constants";
 import { LoggerService } from "../logger/logger.service";
@@ -145,6 +146,41 @@ export class UserController {
     return await this.userService.addOrUpdatePreferenceByUser(
       userId,
       preferenceDto
+    );
+  }
+
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  @Put("/settings/password")
+  @ResponseMessage("Password updated successfully")
+  async updatePasswordThroughSettings(
+    @Body() updatePasswordSettingsDto: UpdatePasswordThroughSettingsDto,
+    @Req() req
+  ): Promise<User> {
+    const userId = req?.user?.userId;
+    this.logger.log(
+      `updatePasswordThroughSettings started for userid - ${userId}`,
+      `${this.AppName}`
+    );
+    if (
+      updatePasswordSettingsDto.confirm_new_password !==
+      updatePasswordSettingsDto.new_password
+    ) {
+      this.logger.error(
+        `updatePasswordThroughSettings failed for userid - ${userId} as new and confirm password doesn't matches`,
+        `${this.AppName}`
+      );
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          message: "Please provide same confirm and new password",
+        },
+        HttpStatus.BAD_REQUEST
+      );
+    }
+    return await this.userService.updatePasswordThroughSettings(
+      updatePasswordSettingsDto,
+      userId
     );
   }
 }
