@@ -37,3 +37,8 @@ export enum jobType {
   intern = "Intern",
   co_founder = "Co-founder",
 }
+
+export enum privacyMode {
+  private = "private",
+  public = "public",
+}

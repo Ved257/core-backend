@@ -10,7 +10,7 @@ import {
   IsString,
   Length,
 } from "class-validator";
-import { currentRole } from "src/enums/user.enum";
+import { currentRole, privacyMode } from "src/enums/user.enum";
 
 export class SignUpDto {
   @IsEmail()
@@ -95,4 +95,11 @@ export class UpdatePasswordThroughSettingsDto {
   @IsString()
   @IsNotEmpty()
   confirm_new_password: string;
+}
+
+export class UpdatePrivacyMode {
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(privacyMode)
+  privacy_mode: privacyMode;
 }

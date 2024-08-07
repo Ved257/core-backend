@@ -7,6 +7,7 @@ import {
   UpdateUserDto,
   SignUpDto,
   UpdatePasswordThroughSettingsDto,
+  UpdatePrivacyMode,
 } from "../dto/userDto";
 import { constants } from "../helper/constants";
 import { LoggerService } from "../logger/logger.service";
@@ -331,6 +332,43 @@ export class UserService {
     } catch (err) {
       this.logger.error(
         `updatePasswordThroughSettings failed with userId - ${userId} with error ${err}`,
+        `${this.AppName}`
+      );
+      throw new HttpException(
+        {
+          status: err?.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+          message: err?.message ?? "Something went wrong",
+        },
+        err?.status ?? HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async updateProfilePrivacy(
+    updatePrivacy: UpdatePrivacyMode,
+    userId: string
+  ): Promise<User> {
+    this.logger.log(
+      `updateProfilePrivacy started for userid - ${userId}`,
+      `${this.AppName}`
+    );
+    try {
+      const user: User = await this.userModel
+        .findByIdAndUpdate(
+          userId,
+          { privacy_mode: updatePrivacy.privacy_mode },
+          { new: true, upsert: false }
+        )
+        .lean()
+        .exec();
+      this.logger.log(
+        `updateProfilePrivacy ended for userid - ${userId}`,
+        `${this.AppName}`
+      );
+      return user;
+    } catch (err) {
+      this.logger.error(
+        `updateProfilePrivacy failed with userId - ${userId} with error ${err}`,
         `${this.AppName}`
       );
       throw new HttpException(

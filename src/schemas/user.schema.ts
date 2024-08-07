@@ -1,5 +1,5 @@
 import * as mongoose from "mongoose";
-import { currentRole } from "src/enums/user.enum";
+import { currentRole, privacyMode } from "src/enums/user.enum";
 import { User } from "../interface/user.interface";
 
 export const userSchema = new mongoose.Schema<User>(
@@ -26,6 +26,11 @@ export const userSchema = new mongoose.Schema<User>(
     term_and_conditions: {
       type: Boolean,
       default: true,
+    },
+    privacy_mode: {
+      type: String,
+      default: "Public",
+      enum: privacyMode,
     },
   },
   { timestamps: true }

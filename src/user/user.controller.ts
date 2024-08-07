@@ -19,6 +19,7 @@ import {
   UpdateUserDto,
   SignUpDto,
   UpdatePasswordThroughSettingsDto,
+  UpdatePrivacyMode,
 } from "src/dto/userDto";
 import { constants } from "../helper/constants";
 import { LoggerService } from "../logger/logger.service";
@@ -182,5 +183,21 @@ export class UserController {
       updatePasswordSettingsDto,
       userId
     );
+  }
+
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  @Put("/settings/privacy")
+  @ResponseMessage("Privacy updated successfully")
+  async changePrivacyMode(
+    @Body() updatePrivacy: UpdatePrivacyMode,
+    @Req() req
+  ): Promise<User> {
+    const userId = req?.user?.userId;
+    this.logger.log(
+      `changePrivacyMode started for userid - ${userId}`,
+      `${this.AppName}`
+    );
+    return await this.userService.updateProfilePrivacy(updatePrivacy, userId);
   }
 }
