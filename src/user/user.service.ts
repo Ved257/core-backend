@@ -8,6 +8,7 @@ import {
   SignUpDto,
   UpdatePasswordThroughSettingsDto,
   UpdatePrivacyMode,
+  UpdateGeneralSettings,
 } from "../dto/userDto";
 import { constants } from "../helper/constants";
 import { LoggerService } from "../logger/logger.service";
@@ -369,6 +370,56 @@ export class UserService {
     } catch (err) {
       this.logger.error(
         `updateProfilePrivacy failed with userId - ${userId} with error ${err}`,
+        `${this.AppName}`
+      );
+      throw new HttpException(
+        {
+          status: err?.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+          message: err?.message ?? "Something went wrong",
+        },
+        err?.status ?? HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async updateGeneralSettings(
+    updateGeneral: UpdateGeneralSettings,
+    userId: string
+  ): Promise<User> {
+    this.logger.log(
+      `updateGeneralSettings started for userid - ${userId}`,
+      `${this.AppName}`
+    );
+    try {
+      const user: User = await this.userModel
+        .findOne({ user_name: updateGeneral.user_name })
+        .lean()
+        .exec();
+      if (user && user._id.toString() !== userId) {
+        this.logger.error(
+          `updateGeneralSettings failed for userid - ${userId} as this username is allready taken`,
+          `${this.AppName}`
+        );
+        throw new HttpException(
+          {
+            status: HttpStatus.BAD_REQUEST,
+            message: "This username is allready taken, please provide another",
+          },
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      const updatedUser: User = await this.userModel
+        .findByIdAndUpdate(userId, updateGeneral, { new: true })
+        .lean()
+        .exec();
+      this.logger.log(
+        `updateGeneralSettings ended for userid - ${userId}`,
+        `${this.AppName}`
+      );
+      return updatedUser;
+    } catch (err) {
+      this.logger.error(
+        `updateGeneralSettings failed with userId - ${userId} with error ${err}`,
         `${this.AppName}`
       );
       throw new HttpException(

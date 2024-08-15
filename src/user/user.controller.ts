@@ -20,6 +20,7 @@ import {
   SignUpDto,
   UpdatePasswordThroughSettingsDto,
   UpdatePrivacyMode,
+  UpdateGeneralSettings,
 } from "src/dto/userDto";
 import { constants } from "../helper/constants";
 import { LoggerService } from "../logger/logger.service";
@@ -199,5 +200,21 @@ export class UserController {
       `${this.AppName}`
     );
     return await this.userService.updateProfilePrivacy(updatePrivacy, userId);
+  }
+
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  @Put("/settings/general")
+  @ResponseMessage("General updated successfully")
+  async changeGeneralSettings(
+    @Body() updateGeneral: UpdateGeneralSettings,
+    @Req() req
+  ): Promise<User> {
+    const userId = req?.user?.userId;
+    this.logger.log(
+      `changeGeneralSettings started for userid - ${userId}`,
+      `${this.AppName}`
+    );
+    return this.userService.updateGeneralSettings(updateGeneral, userId);
   }
 }

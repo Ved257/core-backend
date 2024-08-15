@@ -16,6 +16,8 @@ export interface User extends Document {
   readonly linkedin_profile: string;
   readonly term_and_conditions: boolean;
   readonly privacy_mode: string;
+  readonly user_name: string;
+  readonly profile_pic: string;
 }
 
 export interface loginUser extends User {

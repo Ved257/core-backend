@@ -5,6 +5,7 @@ import { User } from "../interface/user.interface";
 export const userSchema = new mongoose.Schema<User>(
   {
     phone_number: String,
+    user_name: String,
     email: String,
     full_name: String,
     is_community_owner: {
@@ -32,11 +33,13 @@ export const userSchema = new mongoose.Schema<User>(
       default: "Public",
       enum: privacyMode,
     },
+    profile_pic: String,
   },
   { timestamps: true }
 );
 
 userSchema.index({ email: 1 }, { unique: true });
+userSchema.index({ user_name: 1 }, { unique: true });
 
 export const UserModel: mongoose.Model<User> = mongoose.model<User>(
   "user",

@@ -8,6 +8,7 @@ import {
   IsOptional,
   IsPhoneNumber,
   IsString,
+  IsUrl,
   Length,
 } from "class-validator";
 import { currentRole, privacyMode } from "src/enums/user.enum";
@@ -102,4 +103,24 @@ export class UpdatePrivacyMode {
   @IsNotEmpty()
   @IsEnum(privacyMode)
   privacy_mode: privacyMode;
+}
+
+export class UpdateGeneralSettings {
+  @IsString()
+  @IsNotEmpty()
+  full_name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  user_name: string;
+
+  @IsString()
+  @IsOptional()
+  @IsUrl()
+  profile_pic: string;
 }
